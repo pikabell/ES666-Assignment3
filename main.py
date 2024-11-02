@@ -1,7 +1,7 @@
 import pdb
 import src
 import glob
-import importlib
+import importlib.util
 import os
 import cv2
 
@@ -27,12 +27,18 @@ for idx,algo in enumerate(all_submissions):
         ###
         for impaths in glob.glob(path):
             print('\t\t Processing... {}'.format(impaths))
-            stitched_image, homography_matrix_list = inst.make_panaroma_for_images_in(path=impaths)
+            stitched_image, homography_matrix_list , int_list = inst.make_panaroma_for_images_in(path=impaths)
 
             outfile =  './results/{}/{}.png'.format(impaths.split(os.sep)[-1],spec.name)
             os.makedirs(os.path.dirname(outfile),exist_ok=True)
             cv2.imwrite(outfile,stitched_image)
+            for i in range(len(int_list)):
+                cv2.imwrite('./results/{}/stitch_{}.png'.format(impaths.split(os.sep)[-1],i),int_list[i])
             print(homography_matrix_list)
+            # create a file to write homography matrix
+            with open('./results/{}/homography_matrix.txt'.format(impaths.split(os.sep)[-1]), 'w') as f:
+                for item in homography_matrix_list:
+                    f.write("%s\n" % item)
             print('Panaroma saved ... @ {}'.format(outfile))
             print('\n\n')
 
